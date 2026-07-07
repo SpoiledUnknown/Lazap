@@ -91,12 +91,17 @@ GLuint ImageManager::loadSVG(b::EmbedInternal::EmbeddedFile embed,
 
   auto elements = svg->querySelectorAll("path");
   for (auto& element : elements) {
-    uint32_t r = (color >> 16) & 0xFF;
-    uint32_t g = (color >> 8) & 0xFF;
-    uint32_t b = color & 0xFF;
-    uint32_t a = (color >> 24) & 0xFF;
+    uint32_t r = (color >> 24) & 0xFF;
+    uint32_t g = (color >> 16) & 0xFF;
+    uint32_t b = (color >> 8) & 0xFF;
+    uint32_t a = (color) & 0xFF;
 
-    if (a == 0) a = 255;
+    if (a == 0) {
+      a = 255;
+      r = (color >> 16) & 0xFF;
+      g = (color >> 8) & 0xFF;
+      b = color & 0xFF;
+    }
 
     std::string hexColor = "#" + intToHex(r) + intToHex(g) + intToHex(b);
     float opacity = static_cast<float>(a) / 255.0f;

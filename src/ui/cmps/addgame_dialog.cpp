@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <tinyfiledialogs.h>
 
+#include "GLFW/glfw3.h"
 #include "clients/custom_games.h"
 #include "ui/theme.h"
 #include "utils/font_manager.h"
@@ -211,6 +212,7 @@ bool AddGameDialog::PillButton(const char* label, ImTextureID icon, ImVec2 size,
   std::string displayText =
       hashPos ? std::string(label, hashPos - label) : std::string(label);
 
+  ImGui::PushFont(FontManager::getFont("Nunito-SB"), 14.0f);
   ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
 
   float spacing = 8.0f;
@@ -225,7 +227,6 @@ bool AddGameDialog::PillButton(const char* label, ImTextureID icon, ImVec2 size,
   ImVec2 textPos(contentStart.x + iconS.x + spacing,
                  pos.y + (size.y - textSize.y) * 0.5f);
 
-  ImGui::PushFont(FontManager::getFont("Nunito-SB"), 18.0f);
   dl->AddText(textPos, text, displayText.c_str());
   ImGui::PopFont();
 
