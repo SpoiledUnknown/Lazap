@@ -51,8 +51,8 @@ void SettingsPanel::loadSettings() {
   Themes::ACCENT_COLOR = col;
   Themes::BG_OPACITY = bgOpacity > 0.8 ? 0.8 : bgOpacity;
 
-  Themes::ACCENT_COLOR_IMGUI =
-      IM_COL32((col >> 16) & 0xFF, (col >> 8) & 0xFF, col & 0xFF, 255);
+  Themes::ACCENT_COLOR_IMGUI = IM_COL32((col >> 24) & 0xFF, (col >> 16) & 0xFF,
+                                        (col >> 8) & 0xFF, col & 0xFF);
 
   titlebar_->setCustomTitlebar(customTitlebar_);
 
@@ -292,7 +292,8 @@ bool SettingsPanel::addOption(const std::string& label, InputType input,
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() +
                              (widthAvailable - widthNeeded));
 
-        float col[3] = {((Themes::ACCENT_COLOR >> 16) & 0xFF) / 255.0f,
+        float col[4] = {((Themes::ACCENT_COLOR >> 24) & 0xFF) / 255.0f,
+                        ((Themes::ACCENT_COLOR >> 16) & 0xFF) / 255.0f,
                         ((Themes::ACCENT_COLOR >> 8) & 0xFF) / 255.0f,
                         (Themes::ACCENT_COLOR & 0xFF) / 255.0f};
 
@@ -301,10 +302,11 @@ bool SettingsPanel::addOption(const std::string& label, InputType input,
           uint8_t r = static_cast<uint8_t>(col[0] * 255.0f);
           uint8_t g = static_cast<uint8_t>(col[1] * 255.0f);
           uint8_t b = static_cast<uint8_t>(col[2] * 255.0f);
+          uint8_t a = static_cast<uint8_t>(col[3] * 255.0f);
 
-          Themes::ACCENT_COLOR =
-              (uint32_t(r) << 16) | (uint32_t(g) << 8) | uint32_t(b);
-          Themes::ACCENT_COLOR_IMGUI = IM_COL32(r, g, b, 255);
+          Themes::ACCENT_COLOR = (uint32_t(r) << 24) | (uint32_t(g) << 16) |
+                                 (uint32_t(b) << 8) | uint32_t(a);
+          Themes::ACCENT_COLOR_IMGUI = IM_COL32(r, g, b, a);
 
           storage_->updateTOML([](toml::table& config) {
             if (auto settings = config["settings"].as_table()) {
@@ -442,7 +444,7 @@ bool SettingsPanel::ColorBox(const char* id, float color[3], ImVec2 size) {
 
   bool changed = false;
   if (ImGui::BeginPopup(id, ImGuiWindowFlags_NoMove)) {
-    changed = ImGui::ColorPicker3(
+    changed = ImGui::ColorPicker4(
         "##picker", color,
         ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoAlpha |
             ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_PickerHueBar |
